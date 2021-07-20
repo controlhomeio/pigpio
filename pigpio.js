@@ -82,6 +82,12 @@ module.exports.waveAddGeneric = (pulses) => {
   return pigpio.gpioWaveAddGeneric(pulses);
 };
 
+module.exports.waveAddSerial = (gpio, baud, dataBits, stopBits, offset, message)  => {
+  let buf = Buffer.from(message, 'ascii');
+  let numBytes = Buffer.byteLength(buf);
+  return pigpio.gpioWaveAddSerial(gpio, baud, dataBits, stopBits, offset, numBytes, buf);
+};
+
 module.exports.waveCreate = () => {
   return pigpio.gpioWaveCreate();
 };
@@ -286,6 +292,27 @@ class Gpio extends EventEmitter {
 
   glitchFilter(steady) {
     pigpio.gpioGlitchFilter(this.gpio, +steady);
+    return this;
+  }
+
+  serialReadOpen(baud, dataBits) {
+    pigpio.gpioSerialReadOpen(this.gpio, baud, dataBits);
+    return this;
+  }
+  
+  serialReadInvert(invert) {
+    pigpio.gpioSerialReadInvert(this.gpio, invert);
+    return this;
+  }
+  
+  serialRead(bytes = 8192) { 
+    let buf = Buffer.alloc(bytes);
+    let bytesRead = pigpio.gpioSerialRead(this.gpio, buf, bytes);
+    return buf.filter(Boolean);
+  }
+  
+  serialReadClose() {
+    pigpio.gpioSerialReadClose(this.gpio);
     return this;
   }
 
