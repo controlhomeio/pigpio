@@ -115,6 +115,19 @@ export function waveAddNew(): void;
 export function waveAddGeneric(pulses: GenericWaveStep[]): void;
 
 /**
+ * 
+ * Adds a waveform representing serial data to the existing waveform.
+ * Returns the new total number of pulses in the current waveform.
+ * @param gpio an unsigned integer that specifies the GPIO number used to send the serial data
+ * @param baud an unsigned integer from 50 - 1000000, specifies the baud rate.
+ * @param dataBits an unsigned integer from 1 - 32, number of data bits.
+ * @param stopBits an unsigned integer from 1 - 4, number of stop bits.
+ * @param offset an unsigned integer >= 0, the serial data starts `offset` microseconds from the start of the waveform.
+ * @param message a string, the Message to be sent.
+ */
+export function waveAddSerial(gpio: number, baud: number, dataBits: number, stopBits: number, offset: number, message: string): void;
+
+/**
  * Creates a waveform from added data. Returns a wave id.
  * All data previously added with `waveAdd*` methods get cleared.
  * @returns waveId
@@ -756,6 +769,30 @@ export class Gpio extends EventEmitter {
    * Disables aterts for the GPIO. Returns this.
    */
   disableAlert(): Gpio;
+
+  /**
+   * Opens a GPIO for bit bang reading of serial data. Returns this.
+   * @param baud an unsigned integer from 50 - 250000, specifies the baud rate.
+   * @param dataBits an unsigned integer from 1 - 32, number of data bits.
+   */
+  serialReadOpen(baud: number, dataBits: number): Gpio;
+
+  /**
+   * Configures the level logic for bit bang serial readings. Returns this.
+   * @param invert if the level should be inverted or not, 1 or 0
+   */
+  serialReadInvert(invert: boolean): Gpio;
+
+  /**
+   * Returns up to 8192 bytes of serialdata as an Uint8Array read by the gpio.
+   * @param bytes How many bytes you want to read. 1 - 8192, Defaults to 8192.
+   */
+  serialRead(bytes: number): Buffer;
+
+  /**
+   * Closes a GPIO for bit bang reading of serial data. Returns this.
+   */
+  serialReadClose(): Gpio;
 
   /**
    * Sets a glitch filter on a GPIO. Returns this.
